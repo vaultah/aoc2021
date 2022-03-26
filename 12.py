@@ -1,68 +1,45 @@
+import math
 import sys
-from collections import Counter
 
 
-def first(mapping):
-    total_paths = 0
-    stack = [('start', frozenset())]
+def fold_paper(dots, instructions):
+    grid = set(dots)
 
-    while stack:
-        cave, small_visited = stack.pop()
+    for axis, num in instructions:
+        index = int(axis == 'y')
 
-        for nxt in mapping[cave]:
-            if nxt == 'start' or nxt in small_visited:
-                continue
-            elif nxt == 'end':
-                total_paths += 1
-                continue
+        for point in list(grid):
+            if point[index] > num:
+                *new_point, = point
+                new_point[index] = 2 * num - new_point[index]
+                grid.remove(point)
+                grid.add((*new_point,))
 
-            if nxt.islower():
-                temp = small_visited | {nxt}
-            else:
-                temp = small_visited
-
-            stack.append((nxt, temp))
-
-    return total_paths
-
-
-def second(mapping):
-    total_paths = 0
-    stack = [('start', Counter())]
-
-    while stack:
-        cave, small_visited = stack.pop()
-
-        for nxt in mapping[cave]:
-            if nxt == 'start':
-                continue
-
-            if nxt == 'end':
-                total_paths += 1
-                continue
-
-            if small_visited[nxt] and any(v > 1 for v in small_visited.values()):
-                continue
-
-            if nxt.islower():
-                temp = small_visited.copy()
-                temp[nxt] += 1
-            else:
-                temp = small_visited
-
-            stack.append((nxt, temp))
-
-    return total_paths
+    return grid
 
 
 if __name__ == '__main__':
-    lines = [x.strip() for x in sys.stdin.readlines()]
-    mapping = {}
+    dots = []
+    instructions = []
 
-    for line in lines:
-        source, destination = line.split('-')
-        mapping.setdefault(source, []).append(destination)
-        mapping.setdefault(destination, []).append(source)
+    for line in sys.stdin:
+        if not line.strip():
+            break
+        x, y = map(int, line.split(','))
+        dots.append((x, y))
 
-    print(first(mapping))
-    print(second(mapping))
+    for line in sys.stdin:
+        axis, num = line.split('=')
+        instructions.append((axis.rsplit(' ', 1)[-1], int(num)))
+
+    grid = fold_paper(dots, [instructions[0]])
+    print('Points after the first fold:', len(grid))
+
+    grid = fold_paper(dots, instructions)
+    xs, ys = zip(*grid)
+
+    print('Final code:')
+    for y in range(max(ys) + 1):
+        for x in range(max(xs) + 1):
+            print('#' if (x, y) in grid else ' ', end='')
+        print()
