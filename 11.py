@@ -8,15 +8,15 @@ def next_step(grid):
             grid[i][j] += 1
 
     flashed = set()
-    stack = []
+    queue = []
 
     for i in range(len(grid)):
         for j in range(len(grid)):
             if grid[i][j] > 9:
-                stack.append((i, j))
+                queue.append((i, j))
 
-    while stack:
-        i, j = stack.pop(0)
+    while queue:
+        i, j = queue.pop(0)
         if (i, j) in flashed:
             continue
 
@@ -36,7 +36,7 @@ def next_step(grid):
                 if ni < 0 or nj < 0 or ni > len(grid) - 1 or nj > len(grid) - 1:
                     continue
 
-                stack.append((ni, nj))
+                queue.append((ni, nj))
 
     return total_flashes
 
