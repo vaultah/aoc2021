@@ -12,14 +12,14 @@ def count_shots(xmin, xmax, ymin, ymax):
                 x += vx
                 y += vy
 
+                if xmin <= x <= xmax and ymin <= y <= ymax:
+                    count += 1
+                    break
+
                 if vx > 0:
                     vx -= 1
 
                 vy -= 1
-
-                if xmin <= x <= xmax and ymin <= y <= ymax:
-                    count += 1
-                    break
 
     return count
 
